@@ -7,7 +7,7 @@
 
 ## Usage
 
-Build the using the below command  or Download it from [here]() 
+Build the using the below command  or Download it from [here](https://github.com/JOSHUAJEBARAJ/docker-clean/blob/main/docker-clean) 
 
 ```
 go build .
