@@ -3,6 +3,7 @@ package dock
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
@@ -14,19 +15,24 @@ type Image struct {
 	Name string
 }
 
-func GetImages() []Image {
-
-	var images []Image
-
+func Init() (*client.Client, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+
+	return cli, nil
+
+}
+
+func GetImages(cli *client.Client) ([]Image, error) {
+
+	var images []Image
 
 	imageslist, err := cli.ImageList(context.Background(), types.ImageListOptions{})
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	for _, image := range imageslist {
@@ -40,17 +46,19 @@ func GetImages() []Image {
 
 	}
 
-	return images
+	return images, nil
 }
 
 func (img *Image) Delete(id string) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	_, err2 := cli.ImageRemove(context.Background(), id, types.ImageRemoveOptions{Force: true})
-	if err2 != nil {
-		fmt.Println("Error")
+	_, err = cli.ImageRemove(context.Background(), id, types.ImageRemoveOptions{Force: true})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }

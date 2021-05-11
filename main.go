@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/JOSHUAJEBARAJ/docker-clean/dock"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -8,7 +11,14 @@ import (
 
 func main() {
 
-	images := dock.GetImages()
+	cli, err := dock.Init()
+	if err != nil {
+		exit(err)
+	}
+	images, err := dock.GetImages(cli)
+	if err != nil {
+		exit(err)
+	}
 
 	app := createApp(images)
 
@@ -16,6 +26,11 @@ func main() {
 		panic(err)
 	}
 
+}
+
+func exit(e error) {
+	fmt.Println(e)
+	os.Exit(1)
 }
 
 func createApp(images []dock.Image) (app *tview.Application) {
@@ -50,10 +65,9 @@ func createApp(images []dock.Image) (app *tview.Application) {
 					id = v.Id
 				}
 			}
+			image.Delete(id)
 			list.RemoveItem(index)
 			// valling the delete function
-
-			image.Delete(id)
 
 			return nil
 		case tcell.KeyEsc:
